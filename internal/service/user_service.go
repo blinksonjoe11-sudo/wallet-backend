@@ -99,7 +99,7 @@ func (svc *UserService) Login(input model.UserLoginInput) (AuthResult, error) {
 	// }
 
 	if err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(input.Password)); err != nil {
-		return AuthResult{}, fmt.Errorf("Email/Password Incorrect: %v", err)
+		return AuthResult{}, errors.New("Email/Password incorrect")
 	}
 
 	// generate jwt token

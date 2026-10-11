@@ -9,6 +9,7 @@ import (
 	"wallet-api/internal/repo"
 	"wallet-api/internal/service"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +20,13 @@ func NewRouter(a *app.App, cfg config.Config) *gin.Engine {
 	r.Use(gin.Logger())
 
 	r.Use(gin.Recovery())
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	}))
 
 	r.GET("/health", health)
 

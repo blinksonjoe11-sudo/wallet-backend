@@ -145,6 +145,10 @@ func (svc *WalletService) Transfer(pin string, senderId uuid.UUID, accountNumber
 			return errors.New("Insufficient Funds")
 		}
 
+		if accountNumber == sender.AccountNumber {
+			return errors.New("Invalid, cant send funds to yourself")
+		}
+
 		if amount+fee > sender.SingleLimit {
 			return errors.New("Amount exceeds single transfer limit")
 		}
@@ -279,17 +283,21 @@ func (svc *WalletService) UpdateWalletPinUser(userId uuid.UUID, oldPin string, n
 			return err
 		}
 
-		// if increment > 3, then freeze acc
+		// if increment > 3, then suspend acc
 		if u.FailedPinAttempts+1 >= 3 {
 
 			if err := svc.repo.LockWallet(u.ID, time.Now().Add(30*time.Minute)); err != nil {
 				return errors.New("Failed to lock wallet")
 			}
-			return errors.New("too many attempts, wallet locked for 1 minute")
+			return errors.New("too many attempts, wallet locked for 30 minute")
 		}
 
 		return errors.New("Old Pin Not Correct")
 
+	}
+
+	if oldPin == newPin {
+		return errors.New("Cant use previous pin, set a new one")
 	}
 
 	//create new pin
